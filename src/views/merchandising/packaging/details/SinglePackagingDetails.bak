@@ -1,0 +1,151 @@
+import _ from 'lodash';
+import React, { Fragment, useState } from 'react';
+import { Maximize2, Minimize2, MinusSquare } from 'react-feather';
+import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router';
+import { Button, Collapse, Label, Table } from 'reactstrap';
+import { randomIdGenerator } from '../../../../utility/Utils';
+import { bindPackagingDetails } from '../store/action';
+
+const SinglePackagingDetails = () => {
+    const dispatch = useDispatch();
+    const [isOpen, setIsOpen] = useState( [] );
+    const { singlePackagingDetails } = useSelector( ( { packaging } ) => packaging );
+
+    const { replace } = useHistory();
+    const handleCollapsibleTableOpen = ( fieldId ) => {
+        const updatedData = singlePackagingDetails?.map( details => {
+            if ( fieldId === details.fieldId ) {
+                details['isRowOpen'] = !details.isRowOpen;
+            }
+            return details;
+        } );
+        dispatch( bindPackagingDetails( updatedData ) );
+    };
+    const handleRemovePackagingDetailsRow = ( fieldId ) => {
+        // const updatedData = [...packagingDetails];
+        // updatedData.splice( updatedData.findIndex( x => x.fieldId === fieldId ), 1 );
+        // setPackagingDetails( updatedData );
+    };
+    const handleCancel = () => {
+        replace( '/purchase-order' );
+    };
+    return (
+        <div className="packing-scc-table">
+            <Table size="sm" bordered >
+                <thead className='thead-light  text-center'>
+                    <tr>
+                        <th className="text-nowrap">#</th >
+                        <th className="text-nowrap">Style No</th >
+                        <th className="text-nowrap">Pack. NO.</th >
+                        <th className="text-nowrap">{`Carton's No Series`}</th>
+                        <th>Units Per Pack.</th>
+                        <th>Total Pack. Size</th>
+                        <th>Total Units</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody className="text-center">
+                    {
+                        singlePackagingDetails.length > 0 && (
+                            singlePackagingDetails?.map( i => (
+                                <Fragment key={i.id}>
+                                    <tr>
+                                        <td>
+                                            <Button.Ripple for="collapseId" tag={Label} onClick={() => { handleCollapsibleTableOpen( i.fieldId ); }} className='btn-icon p-0' color='flat-primary' >
+                                                <Maximize2 className={i.isRowOpen ? 'd-none' : 'd'} id="collapseId" size={15} color="#7367f0" />
+                                                <Minimize2 className={i.isRowOpen ? 'd' : 'd-none'} id="collapseId" size={15} color="#28c76f" />
+                                            </Button.Ripple>
+                                        </td>
+                                        <td>{i.styleNo}</td>
+                                        <td>{i.packNo}</td>
+                                        <td>{i.cartonNoSeries}</td>
+                                        <td>{i.unitPerPack}</td>
+                                        <td>{i.totalPackSize}</td>
+                                        <td>{i.totalUnit}</td>
+                                        <td>
+                                            <span>
+                                                <Button.Ripple
+                                                    id="deleteFabId"
+                                                    tag={Label} onClick={() => { handleRemovePackagingDetailsRow( i.fieldId ); }}
+                                                    className='btn-icon p-0'
+                                                    color='flat-danger'
+                                                >
+                                                    <MinusSquare size={18} id="deleteFabId" color="red" />
+                                                </Button.Ripple>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colSpan={5}>
+                                            <Collapse isOpen={i.isRowOpen}>
+                                                <Table id="tableId">
+                                                    <thead className='thead-light table-bordered'>
+                                                        <tr>
+                                                            <th className="text-nowrap" >Color</th>
+                                                            {
+                                                                ( _.uniqBy( i.packagingDetails, 'size' )?.map( i => (
+                                                                    <th key={i.detailId}>
+                                                                        {i.size}
+                                                                    </th>
+                                                                ) ) )
+                                                            }
+                                                            <th>Total Unit</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {
+                                                            Object.keys( _.groupBy( i.packagingDetails, 'colorName' ) )?.map( pack => {
+                                                                return ( _.groupBy( i.packagingDetails, 'colorName' )[pack] )?.map( ( packItem, index ) => (
+                                                                    index === 0 ? <tr key={randomIdGenerator()}>
+                                                                        <td  >
+                                                                            {packItem.colorName}
+                                                                        </td>
+                                                                        {
+                                                                            i.packagingDetails?.filter( p => p.colorName === packItem.colorName )?.map( i => (
+                                                                                <td key={i.detailId}>
+                                                                                    {i.quantity}
+                                                                                </td>
+                                                                            ) )
+                                                                        }
+                                                                    </tr> : null
+                                                                ) );
+                                                            } )
+                                                        }
+                                                        {/* {
+
+                                                            i.packagingDetails?.map( cs => (
+                                                                <tr key={cs.detailId} >
+                                                                    <td>
+                                                                        {console.log( _.groupBy( i.packagingDetails, 'colorName' ) )}
+                                                                        {cs.colorName}
+                                                                    </td>
+
+                                                                    {
+                                                                        i.packagingDetails?.map( i => (
+                                                                            <td key={i.detailId}>
+                                                                                {i.quantity}
+                                                                            </td>
+                                                                        ) )
+                                                                    }
+                                                                    <td>
+                                                                    </td>
+                                                                </tr>
+                                                            ) )
+                                                        } */}
+                                                    </tbody>
+                                                </Table>
+                                            </Collapse>
+                                        </td>
+                                    </tr>
+                                </Fragment>
+                            ) )
+                        )
+                    }
+                </tbody>
+            </Table >
+        </div >
+    );
+};
+
+export default SinglePackagingDetails;
