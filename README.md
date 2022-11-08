@@ -6,5 +6,6 @@
 > - React .
 > - Redux.
 > - React Bootstrap.
+> - SCSS.
 >
 >  *Everything* JS Based .
