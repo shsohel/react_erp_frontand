@@ -1,4 +1,5 @@
 # Warning: Application not Run
+
 ## you can check code only
 
 > #### Application Basis
@@ -8,4 +9,15 @@
 > - React Bootstrap.
 > - SCSS.
 >
->  *Everything* JS Based .
+> *Everything* JS Based .
+
+> #### Implementation
+>
+> - Re usable Component and Function
+> - Data Table
+> - utility
+> - Custom Component
+> - Authentication and Authorization
+> - Dynamic Navigation
+> - Dynamic Route
+>
